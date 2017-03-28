@@ -38,7 +38,6 @@ class BlackJack
     print_greeting_message
     setup_game
     play_game
-
   end
 
   #setup table
@@ -104,7 +103,7 @@ class BlackJack
   end
 
   def print_greeting_message
-    puts "----- STARTING A NEW GAME OF BLACKJACK------\n"\
+    puts "\n----- STARTING A NEW GAME OF BLACKJACK------\n"\
     "Shuffling cards....\n"\
 
   end
@@ -124,11 +123,11 @@ class BlackJack
     if (@player.score < @dealer.score && @dealer.score <= 21) || @player.score > 21 # Dealer Wins
       puts "\tPlayer got bust " if @player.bust?
       puts "\tDealer has a Blackjack!" if @dealer.blackjack?
-      puts "\tDealer wins "
+      puts "\tDealer wins (amount : #{@player.bet})"
     elsif (@dealer.score < @player.score && @player.score <= 21) || @dealer.score > 21  # Player Wins
       puts "\tDealer got bust" if @dealer.bust?
       puts "\tPlayer #{@player.id} has a blackjack!" if @player.blackjack?
-      puts "\tPlayer #{@player.id} Wins "
+      puts "\tPlayer #{@player.id} Wins  (amount : #{@player.bet})"
     elsif @player.score == @dealer.score
       puts "Game ends in a Draw \n Player #{@player.id} has deck worth #{@player.score} and Dealer has deck worth #{@dealer.score}"
     end
@@ -159,5 +158,3 @@ class BlackJack
   end
 
 end
-b = BlackJack.new
-#p b.cards

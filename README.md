@@ -20,8 +20,8 @@ This is an implementation of Blackjack in Ruby with the following rules:
 
 Code is written to be self-documenting and as close as possible to idiomatic English.
 
-To Rub this application
-    ruby blackjack.rb
+To Run this application
+    ruby executable.rb
 
 
 ### Requirements
