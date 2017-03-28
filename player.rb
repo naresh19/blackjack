@@ -38,16 +38,16 @@ class Player
         "Player #{id}"
     end
 
+    def blackjack_or_bust?
+      blackjack? || bust?
+    end
+
     def blackjack?
       @score == 21
     end
 
-    def lost_or_won?
-      if @score < 21 # Lost :(
-        return false
-      else
-        return true
-      end
+    def bust?
+      @score > 21
     end
 
 

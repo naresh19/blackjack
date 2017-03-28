@@ -22,8 +22,12 @@ class Dealer
     @score += card.value
   end
 
-
   def blackjack?
     @score == 21
   end
+
+  def bust?
+    @score > 21
+  end
+
 end

@@ -9,10 +9,11 @@ printing.
 =end
 
 class Card
-    attr_reader :value, :face
+    attr_reader :value, :face,:suit
 
-    def initialize(face)
+    def initialize(face,suit)
         @face = face
+        @suit = suit
         case face
         when (2..10) then @value = face.to_i
         when "J" then @value = 10
@@ -22,7 +23,5 @@ class Card
         end
     end
 
-    def print
-        p "#{face}"
-    end
+
 end

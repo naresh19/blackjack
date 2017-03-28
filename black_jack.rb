@@ -32,52 +32,43 @@ class BlackJack
     start_game
   end
 
+
+  private
   def start_game
     print_greeting_message
     setup_game
     play_game
-    #print_state
 
   end
 
+  #setup table
   def setup_game
     get_all_cards
     @cards.shuffle!
     @player.set_player_bet
   end
 
-  def get_all_cards
-    @number_of_deck.times do |i|
-      @cards += (Deck.new.cards)
+  def play_game
+    print_error_and_exit if @status != GAME_STATUSES["in_progress"]
+    deal_initial_cards
+    print_state
+
+    #Player plays first
+    play_player
+
+    #If we already got a result, if not let dealer play
+    if !@player.blackjack_or_bust?
+      play_dealer
+      print_state
     end
-  end
-
-  def print_greeting_message
-    puts "----- STARTING A NEW GAME OF BLACKJACK------\n"\
-    "Shuffling cards....\n"\
-
-  end
-
-  def blackjack?
-    @player.blackjack? || @dealer.blackjack?
-  end
-
-  def declare_winner
-    puts "Player #{@player.id} has a blackjack!" if blackjack?
-    puts "Player #{@player.id} wins"
+    #announce results
+    declare_result
     game_over
   end
 
-  def game_over
-    @status = GAME_STATUSES["over"]
-  end
-
-  def play_game
-    deal_initial_cards
-    print_state
-    #check_for_winner
+  def play_player
     player_stand = false
-    while(!player_stand && !@player.lost_or_won?)
+    while (!player_stand && !@player.blackjack_or_bust?)
       puts "Please make a choice"
       puts "Press '#{STAND_KEY}' for #{KEY_DESCR_MAP[STAND_KEY]}, '#{HIT_KEY}' for #{KEY_DESCR_MAP[HIT_KEY]}"
       action = gets.chomp
@@ -91,45 +82,60 @@ class BlackJack
           puts "no such action, try again..."
       end
     end
-
-    if !@player.lost_or_won?
-      play_dealer
-    end
-    declare_result
-    game_over
   end
 
-  def declare_result
-
-    puts "<<======================================================>>\n"
-    puts "\tPlayer Score : #{@player.score} Dealer Score : #{@dealer.score} "
-    if (@player.score < @dealer.score && @dealer.score <= 21) || @player.score > 21 # Dealer Wins
-      puts "\tPlayer got bust with deck worth #{@player.score}" if @player.score > 21
-      puts "\tDealer has a Blackjack!" if @dealer.blackjack?
-      puts "\tDealer wins with deck worth #{@dealer.score}"
-    elsif (@dealer.score < @player.score && @player.score <= 21) || @dealer.score > 21  # Player Wins
-      puts "\tDealer got bust with deck worth #{@dealer.score}" if @dealer.score > 21
-      puts "\tPlayer #{@player.id} has a blackjack!" if @dealer.blackjack?
-      puts "\tPlayer #{@player.id} Wins with deck worth #{@player.score}"
-    elsif @player.score == @dealer.score
-      puts "Game ends in a Draw \n Player #{@player.id} has deck worth #{@player.score} and Dealer has deck worth #{@dealer.score}"
+  def get_all_cards
+    @number_of_deck.times do |i|
+      @cards += (Deck.new.cards)
     end
-    puts "<<======================================================>>\n"
-
-  end
-
-  def play_dealer
-    puts "Dealer's turn to take cards now"
-    while(@dealer.score<= 16)
-      @dealer.pick_cards @cards.pop
-    end
-    print_state
   end
 
   def deal_initial_cards
     2.times{ @player.pick_cards @cards.pop }
     @dealer.pick_cards @cards.pop
   end
+
+
+  def play_dealer
+    puts "Dealer's turn to take cards now"
+    while(@dealer.score<= 16)
+      @dealer.pick_cards @cards.pop
+    end
+  end
+
+  def print_greeting_message
+    puts "----- STARTING A NEW GAME OF BLACKJACK------\n"\
+    "Shuffling cards....\n"\
+
+  end
+
+  def blackjack?
+    @player.blackjack? || @dealer.blackjack?
+  end
+
+  def game_over
+    @status = GAME_STATUSES["over"]
+  end
+
+
+  def declare_result
+    puts "\n<<======================================================>>\n"
+    puts "\tPlayer Score : #{@player.score} Dealer Score : #{@dealer.score} "
+    if (@player.score < @dealer.score && @dealer.score <= 21) || @player.score > 21 # Dealer Wins
+      puts "\tPlayer got bust " if @player.bust?
+      puts "\tDealer has a Blackjack!" if @dealer.blackjack?
+      puts "\tDealer wins "
+    elsif (@dealer.score < @player.score && @player.score <= 21) || @dealer.score > 21  # Player Wins
+      puts "\tDealer got bust" if @dealer.bust?
+      puts "\tPlayer #{@player.id} has a blackjack!" if @player.blackjack?
+      puts "\tPlayer #{@player.id} Wins "
+    elsif @player.score == @dealer.score
+      puts "Game ends in a Draw \n Player #{@player.id} has deck worth #{@player.score} and Dealer has deck worth #{@dealer.score}"
+    end
+    puts "\n<<======================================================>>\n"
+
+  end
+
 
   def print_state()
     puts "------- CURRENT STATE ---------"
@@ -144,7 +150,12 @@ class BlackJack
   end
 
   def print_cards cards
-    cards.map{|card| "#{card.face}"}.join(' ')
+    cards.map{|card| "#{card.face} #{card.suit}"}.join(' ')
+  end
+
+  def print_error_and_exit
+    puts "Game status is not in progress. Exiting now!!"
+    exit
   end
 
 end

@@ -18,9 +18,9 @@ class Deck
     private
     def create_52_card_deck
       fresh_cards = []
-      4.times do |i|
+      SUITS.each do |suit,shape|
         FACES.each do |f|
-          fresh_cards << Card.new(f)
+          fresh_cards << Card.new(f,shape)
         end
       end
       fresh_cards
